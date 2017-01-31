@@ -1,0 +1,19 @@
+{
+  "name": "git-vsts",
+  "version": "0.1.0",
+  "description": "Command line tool to help work with git in Visual Studio Team Services.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adam Brengesjö",
+  "license": "ISC",
+  "bin": {
+    "git-vsts": "./index.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "request": "^2.79.0",
+    "simple-git": "^1.65.0"
+  }
+}
