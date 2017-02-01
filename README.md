@@ -4,7 +4,7 @@ pushing each commit seperatly to intentionally create multiple update sets.
 
 # Install
 
-    npm install -g
+    npm install -g git-vsts
 
 # Setup
 
