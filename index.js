@@ -32,7 +32,6 @@ git.getRemotes(true)
     .then(() => {
         vsts = new VisualStudioTeamServices(config.instance, config.accessToken);
     })
-    .then(() => Promise.reject(config))
     .then(() => {
         console.log('Fetching latest from server to avoid conflicts...');
         return git.fetch()
@@ -73,7 +72,7 @@ git.getRemotes(true)
         // the commits are in reverse chronological order (newest first)
         let oldestCommit = data.commits[data.commits.length - 1];
         console.log(util.format('pushing first commit %s...', oldestCommit.hash));
-        return git.push(['origin', oldestCommit.hash + ':' + data.branchName, '--force-with-lease'])
+        return git.push(['origin', oldestCommit.hash + ':refs/heads/' + data.branchName, '--force-with-lease'])
             .then(() => Promise.resolve(data));
     })
     .then(data => {
@@ -90,6 +89,8 @@ git.getRemotes(true)
         return vsts.getRepositories(config.project)
             .then(response => {
                 let repositories = response.body.value;
+                if (!repositories)
+                    return Promise.reject('Could not get any repositories. Check your access token.');
                 if (repositories.length > 1)
                     return Promise.reject('There is more than one repository in the project.');
                 else if (repositories.length < 0)
@@ -106,7 +107,11 @@ git.getRemotes(true)
     .then(data => data.commits.reverse().slice(1).reduce((p, commit) => p.then(() => {
             console.log(util.format('pushing %s...', commit.hash));
             return git.push(['origin', commit.hash + ':' + data.branchName, '--force-with-lease']);
-    }), Promise.resolve()))
+    }), Promise.resolve()).then(Promise.resolve(data)))
+    .then(data => {
+        return git.raw(['branch','-u', 'origin', data.branchName])
+            .then(out => console.log(out.trim()));
+    })
     .then(() => console.log('All done!'))
     .catch(error => console.error('ERROR', error));
 /**/
