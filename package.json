@@ -1,6 +1,6 @@
 {
   "name": "git-vsts",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Command line tool to help work with git in Visual Studio Team Services.",
   "main": "index.js",
   "scripts": {

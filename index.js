@@ -104,12 +104,21 @@ git.getRemotes(true)
             })
             .then(() => Promise.resolve(data));
     })
-    .then(data => data.commits.reverse().slice(1).reduce((p, commit) => p.then(() => {
-            console.log(util.format('pushing %s...', commit.hash));
-            return git.push(['origin', commit.hash + ':' + data.branchName, '--force-with-lease']);
-    }), Promise.resolve()).then(Promise.resolve(data)))
     .then(data => {
-        return git.raw(['branch','-u', 'origin', data.branchName])
+        return data
+            .commits
+            .reverse()
+            .slice(1)
+            .reduce((p, commit) => {
+                return p.then(() => {
+                    console.log(util.format('pushing %s...', commit.hash));
+                    return git.push(['origin', commit.hash + ':' + data.branchName, '--force-with-lease']);
+                });
+            }, Promise.resolve())
+            .then(() => Promise.resolve(data));
+    })
+    .then(data => {
+        return git.raw(['branch','-u', 'origin/'+data.branchName])
             .then(out => console.log(out.trim()));
     })
     .then(() => console.log('All done!'))
